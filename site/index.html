@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jobs in Switzerland</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 fill=%27%23d8281e%27/><path d=%27M40 20h20v20h20v20H60v20H40V60H20V40h20z%27 fill=%27white%27/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3f4f2; --surface:#ffffff; --ink:#16181d; --muted:#5d646b;
+  --rule:#d3d7d5; --red:#d8281e; --red-ink:#ffffff; --focus:#1d4ed8;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#14171a; --surface:#1b1f23; --ink:#eceeed; --muted:#9aa3a9;
+    --rule:#2d3338; --red:#e5483d; --red-ink:#14171a; --focus:#7aa2ff; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14171a; --surface:#1b1f23; --ink:#eceeed; --muted:#9aa3a9;
+  --rule:#2d3338; --red:#e5483d; --red-ink:#14171a; --focus:#7aa2ff; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);
+  font:400 16px/1.5 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+header{padding:56px 0 28px;border-bottom:2px solid var(--ink)}
+h1{margin:0;font-weight:900;font-size:clamp(2.6rem,9vw,5.6rem);line-height:.92;letter-spacing:-.04em}
+h1 span{color:var(--red)}
+.sub{margin:18px 0 0;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 20px}
+
+.controls{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;padding:20px 0}
+label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;height:44px;padding:0 12px;border:1px solid var(--rule);border-radius:2px;
+  background:var(--surface);color:var(--ink);font:inherit}
+.result-line{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0 10px;
+  border-bottom:1px solid var(--ink);color:var(--muted);font-size:.9rem}
+
+ul{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px 24px;align-items:center;
+  padding:18px 0;border-bottom:1px solid var(--rule)}
+.row h2{margin:0;font-size:1.2rem;font-weight:700;line-height:1.25;letter-spacing:-.01em}
+.who{margin:2px 0 0;color:var(--ink)}
+.meta{margin:6px 0 0;color:var(--muted);font-size:.88rem;display:flex;flex-wrap:wrap;gap:2px 14px}
+.tag{font-weight:500;color:var(--ink)}
+.snip{margin:8px 0 0;color:var(--muted);font-size:.9rem;max-width:68ch}
+.apply{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;
+  background:var(--red);color:var(--red-ink);font-weight:700;text-decoration:none;border-radius:2px;white-space:nowrap}
+.apply:hover{filter:brightness(.92)}
+
+.empty{padding:64px 0;color:var(--muted)}
+.empty strong{display:block;color:var(--ink);font-size:1.2rem;margin-bottom:4px}
+.more{display:block;margin:28px auto 0;height:44px;padding:0 28px;font:inherit;font-weight:500;cursor:pointer;
+  background:transparent;color:var(--ink);border:1px solid var(--ink);border-radius:2px}
+.more:hover{background:var(--ink);color:var(--paper)}
+footer{margin:56px 0 40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--muted);font-size:.85rem}
+footer ul{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:6px}
+.bad{color:var(--red)}
+
+@media (max-width:760px){
+  header{padding-top:36px}
+  .controls{grid-template-columns:1fr 1fr}
+  .controls .q{grid-column:1/-1}
+  .row{grid-template-columns:1fr}
+  .apply{justify-self:start}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Jobs in<br>Switzer<span>land</span></h1>
+    <p class="sub"><span id="total">Loading jobs…</span><span id="updated"></span></p>
+  </header>
+
+  <section class="controls" aria-label="Filters">
+    <div class="q"><label for="q">Search title, company or place</label>
+      <input id="q" type="search" placeholder="e.g. data engineer, Zürich" autocomplete="off"></div>
+    <div><label for="source">Source</label><select id="source"><option value="">All sources</option></select></div>
+    <div><label for="mode">Work mode</label>
+      <select id="mode"><option value="">Any</option><option value="remote">Remote</option><option value="onsite">On-site / hybrid</option></select></div>
+    <div><label for="sort">Sort by</label>
+      <select id="sort"><option value="new">Newest</option><option value="company">Company A–Z</option></select></div>
+  </section>
+
+  <div class="result-line"><span id="count" aria-live="polite"></span></div>
+  <ul id="list"></ul>
+  <button class="more" id="more" hidden>Show more jobs</button>
+
+  <footer>
+    <div>Listings come from public job APIs. Apply links open the original posting.</div>
+    <ul id="status"></ul>
+  </footer>
+</div>
+
+<script>
+const PAGE = 40;
+const $ = id => document.getElementById(id);
+let ALL = [], shown = PAGE;
+
+function el(tag, cls, text){
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+function safeUrl(u){
+  try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; }
+}
+function ago(iso){
+  if (!iso) return "Date not given";
+  const d = (Date.now() - new Date(iso)) / 864e5;
+  if (d < 1) return "Today";
+  if (d < 2) return "Yesterday";
+  if (d < 31) return Math.floor(d) + " days ago";
+  return new Date(iso).toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"});
+}
+
+function filtered(){
+  const q = $("q").value.trim().toLowerCase(), src = $("source").value, mode = $("mode").value;
+  let r = ALL.filter(j =>
+    (!src || j.source === src) &&
+    (!mode || (mode === "remote") === j.remote) &&
+    (!q || `${j.title} ${j.company} ${j.location} ${j.snippet}`.toLowerCase().includes(q)));
+  if ($("sort").value === "company") r = [...r].sort((a,b) => a.company.localeCompare(b.company));
+  return r;
+}
+
+function render(){
+  const rows = filtered(), list = $("list");
+  list.replaceChildren();
+  $("count").textContent = `${rows.length.toLocaleString()} ${rows.length === 1 ? "job" : "jobs"}`;
+
+  if (!rows.length){
+    const d = el("li", "empty");
+    d.append(el("strong", null, "No jobs match these filters"), "Try a broader search or set Source and Work mode to “All”.");
+    list.append(d);
+  }
+  for (const j of rows.slice(0, shown)){
+    const li = el("li", "row"), main = el("div");
+    main.append(el("h2", null, j.title), el("p", "who", j.company));
+    const meta = el("div", "meta");
+    meta.append(el("span", null, j.location),
+      ...(j.remote ? [el("span", "tag", "Remote")] : []),
+      ...(j.type ? [el("span", null, j.type)] : []),
+      ...(j.salary ? [el("span", null, j.salary)] : []),
+      el("span", null, ago(j.posted)), el("span", null, "via " + j.source));
+    main.append(meta);
+    if (j.snippet) main.append(el("p", "snip", j.snippet));
+    li.append(main);
+    const href = safeUrl(j.url);
+    if (href){
+      const a = el("a", "apply", "Apply");
+      a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.setAttribute("aria-label", `Apply for ${j.title} at ${j.company}`);
+      li.append(a);
+    }
+    list.append(li);
+  }
+  $("more").hidden = rows.length <= shown;
+}
+
+async function init(){
+  try {
+    const res = await fetch("jobs.json", {cache: "no-cache"});
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    ALL = data.jobs;
+    $("total").textContent = `${ALL.length.toLocaleString()} open positions from ${Object.values(data.sources).filter(s => s.ok).length} sources`;
+    $("updated").textContent = "Updated " + new Date(data.generated_at).toLocaleString("en-GB", {dateStyle:"medium", timeStyle:"short"});
+    [...new Set(ALL.map(j => j.source))].sort().forEach(s => {
+      const o = el("option", null, s); o.value = s; $("source").append(o);
+    });
+    for (const [name, s] of Object.entries(data.sources)){
+      const li = el("li", s.ok ? "" : "bad", s.ok ? `${name}: ${s.count}` : `${name}: ${s.note || "failed"}`);
+      $("status").append(li);
+    }
+    render();
+  } catch (e) {
+    $("total").textContent = "Could not load jobs.json";
+    const li = el("li", "empty");
+    $("list").append(li);
+    li.append(el("strong", null, "No data yet"), "Run the “Update jobs and deploy site” workflow, or run the scraper locally and serve the site folder over HTTP.");
+  }
+}
+
+["q", "source", "mode", "sort"].forEach(id => $(id).addEventListener("input", () => { shown = PAGE; render(); }));
+$("more").addEventListener("click", () => { shown += PAGE; render(); });
+init();
+</script>
+</body>
+</html>
