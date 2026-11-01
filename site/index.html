@@ -37,7 +37,7 @@ h1{margin:0;font-weight:900;font-size:clamp(2.6rem,9vw,5.6rem);line-height:.92;l
 h1 span{color:var(--red)}
 .sub{margin:18px 0 0;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 20px}
 
-.controls{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:12px;padding:20px 0}
+.controls{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;padding:20px 0}
 label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
 input,select{width:100%;height:44px;padding:0 12px;border:1px solid var(--rule);border-radius:2px;
   background:var(--surface);color:var(--ink);font:inherit}
@@ -51,7 +51,6 @@ ul{list-style:none;margin:0;padding:0}
 .who{margin:2px 0 0;color:var(--ink)}
 .meta{margin:6px 0 0;color:var(--muted);font-size:.88rem;display:flex;flex-wrap:wrap;gap:2px 14px}
 .tag{font-weight:500;color:var(--ink)}
-.relo{font-weight:700;color:var(--ink);box-shadow:inset 0 -2px 0 var(--red)}
 .snip{margin:8px 0 0;color:var(--muted);font-size:.9rem;max-width:68ch}
 .apply{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;
   background:var(--red);color:var(--red-ink);font-weight:700;text-decoration:none;border-radius:2px;white-space:nowrap}
@@ -86,9 +85,6 @@ footer ul{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:6px}
   <section class="controls" aria-label="Filters">
     <div class="q"><label for="q">Search title, company or place</label>
       <input id="q" type="search" placeholder="e.g. data engineer, Zürich" autocomplete="off"></div>
-    <div><label for="level">Level</label>
-      <select id="level"><option value="">Mid to lead</option><option value="mid">High mid</option>
-      <option value="senior">Senior</option><option value="lead">Lead / Staff+</option></select></div>
     <div><label for="source">Source</label><select id="source"><option value="">All sources</option></select></div>
     <div><label for="mode">Work mode</label>
       <select id="mode"><option value="">Any</option><option value="remote">Remote</option><option value="onsite">On-site / hybrid</option></select></div>
@@ -101,7 +97,7 @@ footer ul{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:6px}
   <button class="more" id="more" hidden>Show more jobs</button>
 
   <footer>
-    <div>Software engineering roles at high-mid level and above that mention relocation support. “Unconfirmed” means the source’s search matched “relocation” but the short preview doesn’t show it, so check the posting. Apply links open the original listing.</div>
+    <div>Listings come from public job APIs. Apply links open the original posting.</div>
     <ul id="status"></ul>
   </footer>
 </div>
@@ -133,7 +129,6 @@ function filtered(){
   const q = $("q").value.trim().toLowerCase(), src = $("source").value, mode = $("mode").value;
   let r = ALL.filter(j =>
     (!src || j.source === src) &&
-    (!$("level").value || j.level === $("level").value) &&
     (!mode || (mode === "remote") === j.remote) &&
     (!q || `${j.title} ${j.company} ${j.location} ${j.snippet}`.toLowerCase().includes(q)));
   if ($("sort").value === "company") r = [...r].sort((a,b) => a.company.localeCompare(b.company));
@@ -147,17 +142,14 @@ function render(){
 
   if (!rows.length){
     const d = el("li", "empty");
-    d.append(el("strong", null, "No jobs match these filters"), "Try a broader search, or set Level, Source and Work mode back to “All”.");
+    d.append(el("strong", null, "No jobs match these filters"), "Try a broader search or set Source and Work mode to “All”.");
     list.append(d);
   }
   for (const j of rows.slice(0, shown)){
     const li = el("li", "row"), main = el("div");
     main.append(el("h2", null, j.title), el("p", "who", j.company));
     const meta = el("div", "meta");
-    const LEVEL = {mid: "High mid", senior: "Senior", lead: "Lead / Staff+"};
-    meta.append(el("span", "tag", LEVEL[j.level] || ""),
-      el("span", "relo", j.relocation === "yes" ? "Relocation support" : "Relocation (unconfirmed)"),
-      el("span", null, j.location),
+    meta.append(el("span", null, j.location),
       ...(j.remote ? [el("span", "tag", "Remote")] : []),
       ...(j.type ? [el("span", null, j.type)] : []),
       ...(j.salary ? [el("span", null, j.salary)] : []),
@@ -189,7 +181,7 @@ async function init(){
       const o = el("option", null, s); o.value = s; $("source").append(o);
     });
     for (const [name, s] of Object.entries(data.sources)){
-      const li = el("li", s.ok ? "" : "bad", s.ok ? `${name}: ${s.count} of ${s.seen ?? s.count} matched` : `${name}: ${s.note || "failed"}`);
+      const li = el("li", s.ok ? "" : "bad", s.ok ? `${name}: ${s.count}` : `${name}: ${s.note || "failed"}`);
       $("status").append(li);
     }
     render();
@@ -201,7 +193,7 @@ async function init(){
   }
 }
 
-["q", "level", "source", "mode", "sort"].forEach(id => $(id).addEventListener("input", () => { shown = PAGE; render(); }));
+["q", "source", "mode", "sort"].forEach(id => $(id).addEventListener("input", () => { shown = PAGE; render(); }));
 $("more").addEventListener("click", () => { shown += PAGE; render(); });
 init();
 </script>
